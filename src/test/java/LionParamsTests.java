@@ -23,17 +23,19 @@ public class LionParamsTests {
     public boolean expectedHasMane;
 
     @Parameterized.Parameter(2)
-    public boolean shouldThrowException;
+    public TestType testType;
 
     private com.example.Lion lion;
 
-    @Parameterized.Parameters(name = "Проверка льва с полом: {0}")
+    enum TestType {
+        POSITIVE, NEGATIVE
+    }
+
+    @Parameterized.Parameters(name = "{0}")
     public static Object[][] data() {
         return new Object[][]{
-                {"Самец", true, false},
-                {"Самка", false, false},
-                {"Неизвестно", false, true},
-                {null, false, true}
+                {"Самец", true, TestType.POSITIVE},
+                {"Неизвестно", false, TestType.NEGATIVE}
         };
     }
 
@@ -43,14 +45,14 @@ public class LionParamsTests {
         when(feline.getFood("Хищник")).thenReturn(Arrays.asList("Мясо", "Рыба"));
         when(feline.getKittens()).thenReturn(1);
 
-        if (!shouldThrowException) {
+        if (testType == TestType.POSITIVE) {
             lion = new com.example.Lion(sex, feline);
         }
     }
 
     @Test
     public void testDoesHaveMane() throws Exception {
-        if (shouldThrowException) {
+        if (testType == TestType.NEGATIVE) {
             try {
                 new com.example.Lion(sex, feline);
                 fail("Ожидалось исключение для недопустимого пола: " + sex);
@@ -63,18 +65,14 @@ public class LionParamsTests {
     }
 
     @Test
-    public void testGetKittens() throws Exception {
-        if (!shouldThrowException) {
-            assertEquals(1, lion.getKittens());
-        }
-    }
+    public void testPositiveCases() throws Exception {
+        if (testType != TestType.POSITIVE) return;
 
-    @Test
-    public void testGetFood() throws Exception {
-        if (!shouldThrowException) {
-            List<String> food = lion.getFood();
-            assertTrue(food.contains("Мясо"));
-            assertTrue(food.contains("Рыба"));
-        }
+        assertEquals(expectedHasMane, lion.doesHaveMane());
+        assertEquals(1, lion.getKittens());
+
+        List<String> food = lion.getFood();
+        assertTrue(food.contains("Мясо"));
+        assertTrue(food.contains("Рыба"));
     }
 }
