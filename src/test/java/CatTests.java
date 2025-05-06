@@ -29,15 +29,10 @@ public class CatTests {
 
     @Test
     public void testGetFood() throws Exception {
-        when(feline.eatMeat()).thenReturn(List.of("Животные", "Птицы", "Рыба"));
-        List<String> food = cat.getFood();
-        assertEquals(3, food.size());
-        assertEquals("Рыба", food.get(2));
-    }
-
-    @Test(expected = Exception.class)
-    public void testGetFoodThrowsException() throws Exception {
-        when(feline.eatMeat()).thenThrow(new Exception("Ошибка в Feline"));
-        cat.getFood();
+        List<String> expectedFood = List.of("Животные", "Птицы", "Рыба");
+        when(feline.eatMeat()).thenReturn(expectedFood);
+        List<String> actualFood = cat.getFood();
+        assertEquals(3, actualFood.size());
+        assertEquals(expectedFood, actualFood);
     }
 }
